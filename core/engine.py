@@ -48,14 +48,15 @@ class LunarEngine:
         """
         print(f"\n🤖 [RESOLVER] Computing automated evasion vector for {evade_vessel.callsign}...")
         
-        # We need to ensure a vertical separation of at least VERTICAL_MIN + 500m buffer
         required_clearance = self.VERTICAL_MIN + 500.0
         
-        # Calculate how much Delta-V in Z axis is needed to change altitude over the given time
-        # Basic physics approximation: dZ = dVz * t -> dVz = dZ / t
-        needed_dv_z = required_clearance / time_to_impact
+        # BEZPEČNOSTNÍ POJISTKA PROTI DĚLENÍ NULOU
+        # Pokud je čas do srážky 0, počítáme s 1 vteřinou pro nouzový zážeh
+        safe_time = max(1, time_to_impact)
         
-        # If evade_vessel is already higher, push it up. If lower, push it down.
+        # Nyní už dělení proběhne vždy bezpečně
+        needed_dv_z = required_clearance / safe_time
+        
         if evade_vessel.z < target_vessel.z:
             needed_dv_z = -needed_dv_z
 
