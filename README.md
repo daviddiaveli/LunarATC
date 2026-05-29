@@ -1,34 +1,65 @@
 # 🌑 LunarATC — The Operating System for Lunar Airspace
 
-A next-generation Air Traffic Control framework defining orbital and suborbital separation standards for lunar operations.
+A next-generation Air Traffic Control (ATC) and Tactical Deconfliction framework engineered for the unique challenges of lunar orbital and suborbital operations.
 
 ---
 
-### 🌍 Proč Měsíc potřebuje nový systém? (Srozumitelně pro každého)
+### 🌍 The Core Problem: Why a New System?
 
-V pozemském letectví se piloti a dispečeři orientují podle tlaku vzduchu. Když letadlo stoupá, tlak klesá, a přístroje díky tomu přesně vědí, v jakém výškovém patře se stroj nachází. Všichni sdílejí stejná pravidla, což zabraňuje kolizím.
+In terrestrial aviation, aircraft maintain separation using barometric altimeters based on sea-level atmospheric pressure. This creates stable, shared flight levels. **The Moon has no atmosphere and no sea level.**
 
-**Na Měsíci ale žádný vzduch není. A chybí tam i hladina moře, od které by se dalo měřit „X metrů nad mořem“.**
+Furthermore, the lunar surface is highly irregular, punctuated by deep craters (e.g., Tycho) and massive mountain ranges. A radar altimeter pointing straight down would show wild, erratic altitude jumps even if the spacecraft were flying in a perfectly straight line, making standard separation impossible.
 
-Měsíční povrch je navíc extrémně rozeklaný, plný hlubokých kráterů a vysokých pohoří. Kdyby měsíční moduly určovaly svou výšku jen pomocí přístrojů namířených dolů na zem, jejich výška by na obrazovkách divoce skákala nahoru a dolů podle toho, nad čím zrovna letí – i kdyby letěly v naprosto dokonalé přímce.
-
-**Řešení LunarATC:**
-Tento protokol ruší závislost na atmosféře i povrchu. Zavádí matematicky definovanou, dokonale hladkou virtuální sféru (Měsíční referenční elipsoid), která slouží jako „absolutní nula“. Všechny stroje v našem systému určují svou polohu a výšku čistě geometricky vůči tomuto virtuálnímu středu. Výsledkem je stabilní, bezpečný a předvídatelný systém letových hladin ve vakuu.
+**The LunarATC Solution:**
+LunarATC discards aerodynamic tracking in favor of pure astrodynamics. It introduces the **Lunar Reference Ellipsoid (LRE)** — a mathematically perfect virtual sphere. All spacecraft calculate their altitude (Lunar Flight Levels - LFL) purely geometrically against this invisible sphere. This ensures a stable, predictable, and universally shared 3D airspace grid in a vacuum.
 
 ---
 
-### ⚙️ Core Technical Vision & RFC Architecture
+### ⚙️ System Architecture & Features
 
-LunarATC shifts the paradigm of traffic deconfliction from aerodynamic tracking to pure astrodynamics. It is built to handle the chaotic commercial and scientific lunar traffic of the upcoming decades.
+LunarATC is a comprehensive suite featuring a fully realized 6-DOF (Degrees of Freedom) kinematic physics engine, real-time GUI radar, and an autonomous AI integration layer.
 
-#### 🏛️ Structural Blueprint
-The framework is strictly decoupled into protocol specifications and execution layers:
+#### 1. The Core Physics Engine (`/core/engine.py`)
+*   **True Orbital Mechanics:** Replaces linear movement with numerical integration of lunar gravity ($\mu = 4.904 \times 10^{12} \text{ m}^3/\text{s}^2$). Objects automatically maintain stable orbits ($v = \sqrt{\mu / r}$) or follow parabolic escape trajectories.
+*   **6-DOF Kinematics:** Tracks not just X/Y/Z, but Pitch, Yaw, Roll, and their angular velocities.
+*   **Flight Assist (Hover Mode):** Supports low-speed inspection drones or landing craft by calculating constant anti-gravity thrust vectors.
+*   **STCA (Short-Term Conflict Alert):** Predicts 4D trajectories 10 minutes into the future to identify intersecting paths and automatically calculates evasive Delta-V maneuvers.
 
-* **`/rfc` (Request for Comments):** Formal engineering standards. This is where the core physics, data packet structures, and compliance rules are defined.
-* **`/core` (The Deconfliction Engine):** High-integrity Python implementation responsible for 4D trajectory prediction, separation monitoring, and automated clearance generation.
-* **`/simulation` (Traffic Generator):** A stochastic environment generating simultaneous lunar ascents, orbital insertions, and suborbital hops to stress-test the protocol.
+#### 2. Tactical Operations GUI (`gui_3d.py`)
+A PyQt6/OpenGL high-performance tactical interface inspired by military airspace management.
+*   **Orbital Zonations:** Visualizes Low Lunar Orbit (LLO), Medium Lunar Orbit (MLO), and the massive Sphere of Influence (SOI) boundary.
+*   **Sensor Network:** Displays surface infrastructure including Radars, Optical Arrays, and Far-Side Radiotelescopes.
+*   **Restricted Airspace:** Real-time monitoring of no-fly zones (e.g., Apollo 11 Heritage Site, Tycho Military Sector) with automated security alerts.
+*   **Interactive Vectoring:** Controllers can manually input specific $\Delta V$ burns or transmit new Yaw/Pitch heading vectors to spacecraft, complete with simulated "Pilot Override" rejection probabilities.
 
-#### 🛰️ Roadmap & Next Steps
-1. **RFC-001: Reference Frame & Geometric Altimetry** — Establishing the mathematical baseline for vertical separation without atmospheric pressure.
-2. **RFC-002: Lunar-ADS-B State Vector Protocol** — Defining the data packet format for autonomous broadcast telemetry in vacuum (including delta-V vectors).
-3. **RFC-003: Tactical Separation Minimums** — Calculating safety buffers for high-velocity crossing trajectories under 1/6th of Earth's gravity.
+#### 3. LLM Discovery Engine & AI Autopilot
+*   **System Diagnostics:** Integrates a simulated LLM uplink that analyzes black-box crash data (fuel depletion, dark-side LOS dropouts) and generates high-level engineering recommendations.
+*   **Neural Autopilot:** Hook for Reinforcement Learning (PPO) agents to take control of spacecraft and autonomously manage orbital transfers.
+
+---
+
+### 📚 RFC Documentation Library
+
+The operational rules of LunarATC are codified in formal engineering specifications located in the `/rfc` directory:
+
+1. **[RFC-001: Reference Frame & Geometric Altimetry](rfc/RFC-001-Reference-Frame.md)** — The mathematical baseline for vertical separation without atmospheric pressure.
+2. **[RFC-002: Lunar-ADS-B State Vector Protocol](rfc/RFC-002-Lunar-ADS-B.md)** — The data packet format for autonomous broadcast telemetry in a vacuum.
+3. **[RFC-003: Tactical Separation Minimums](rfc/RFC-003-Tactical%20Separation%20Minimums.md)** — Safety buffers and STCA calculation logic for high-velocity crossing trajectories.
+4. **[RFC-004: Terminal Area Management](rfc/RFC-004-Terminal-Area-Management.md)** — Automated Descent Corridors (ADC) and priority routing near lunar bases.
+5. **[RFC-005: Flight Operations & Restricted Airspace](rfc/RFC-005-Flight-Operations.md)** — 6-DOF tracking, ATC vectoring commands, Flight Assist protocols, and military/heritage no-fly zones.
+
+---
+
+### 🚀 Running the Simulation
+
+**1. Launch the 3D Tactical Radar (Full Experience):**
+```bash
+python gui_3d.py
+```
+*Requires `PyQt6`, `pyqtgraph`, `numpy`, and `Pillow`. Use the mouse to rotate the Moon, and click on vessels or prediction lines to open the Tactical Command Center panel.*
+
+**2. Run Headless Simulation (Terminal Only):**
+```bash
+python simulation.py
+```
+*Observe the STCA engine autonomously predicting and resolving conflicts in real-time.*
